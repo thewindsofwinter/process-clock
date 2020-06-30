@@ -14,13 +14,24 @@ namespace ProcessClock
 {
     public partial class Form1 : Form
     {
+
+
         WinEventDelegate dele = null;
         DateTime curr = DateTime.Now;
         Dictionary<String, TimeSpan> dict = null;
         String currprocess = null;
+        String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+
 
         public Form1()
         {
+            string subPath = path + "\\ProcessClock"; // your code goes here
+
+            bool exists = System.IO.Directory.Exists(subPath);
+
+            if (!exists)
+                System.IO.Directory.CreateDirectory(subPath);
+
             InitializeComponent();
             dict = new Dictionary<String, TimeSpan>();
             currprocess = "ProcessClock";
@@ -63,7 +74,7 @@ namespace ProcessClock
             System.TimeSpan diff = DateTime.Now.Subtract(curr);
             if (dict.ContainsKey(currprocess))
             {
-                dict[currprocess].Add(diff);
+                dict[currprocess] = dict[currprocess].Add(diff);
             }
             else
             {
@@ -74,9 +85,9 @@ namespace ProcessClock
             // If one opens the ProcessClock window, the program will automatically write all data to the day's file
             if (s.Equals("ProcessClock"))
             {
-                System.IO.File.WriteAllText(@"C:\Users\winterwind\Desktop\" + now.Month + "-" + now.Day + ".txt", String.Empty);
+                System.IO.File.WriteAllText(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt", String.Empty);
                 using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(@"C:\Users\winterwind\Desktop\" + now.Month + "-" + now.Day + ".txt"))
+            new System.IO.StreamWriter(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt"))
                 {
                     file.WriteLine("Time spent on processes:");
                     foreach (String process in dict.Keys)
