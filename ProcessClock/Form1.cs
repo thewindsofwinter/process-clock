@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -25,7 +26,7 @@ namespace ProcessClock
 
         public Form1()
         {
-            string subPath = path + "\\ProcessClock"; // your code goes here
+            string subPath = path + "\\ProcessClock";
 
             bool exists = System.IO.Directory.Exists(subPath);
 
@@ -34,6 +35,37 @@ namespace ProcessClock
 
             InitializeComponent();
             dict = new Dictionary<String, TimeSpan>();
+
+            Log.Text += subPath + "\\" + curr.Month + "-" + curr.Day + ".txt" + "\r\n";
+            Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
+            if(System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt"))
+            {
+                try
+                {   // Open the text file using a stream reader.
+                    using (StreamReader sr = new StreamReader(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt"))
+                    {
+                        // Read the heading first
+                        sr.ReadLine();
+
+                        String s;
+                        while((s = sr.ReadLine()) != null)
+                        {
+                            // Split based on special delimiter
+                            String[] arr = s.Replace(": ", "~").Split('~');
+                            TimeSpan val = TimeSpan.Parse(arr[1]);
+                            dict.Add(arr[0], val);
+                            Log.Text += "Loaded data: Application " + arr[0] + " used for " + arr[1] + "\r\n";
+                        }
+                    }
+                }
+                catch (IOException e)
+                {
+                    Log.Text += "LOAD DATA FAILED\r\n";
+                    Console.WriteLine("The file could not be read:");
+                    Console.WriteLine(e.Message);
+                }
+            }
+
             currprocess = "ProcessClock";
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
