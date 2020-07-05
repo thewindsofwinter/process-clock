@@ -22,6 +22,8 @@ namespace ProcessClock
         Dictionary<String, TimeSpan> dict = null;
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        String[] colors = { "E62817", "E67E17", "E6D417", "A1E617", "4BE617", "17E639", "17E68F",
+            "17E6E6", "178FE6", "1739E6", "4B17E6" };
 
 
         public Form1()
@@ -131,10 +133,87 @@ namespace ProcessClock
                     }
                 }
                 Log.Text += "Successfully wrote data to file!\r\n";
+                this.Invalidate(true);
             }
 
             currprocess = s;
             curr = now;
+        }
+
+        private void DrawPanel_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics graph;
+
+            graph = e.Graphics;
+            int width = DrawPanel.Width;
+            int height = DrawPanel.Height;
+            Font labelFont = new Font("Garamond", 18);
+            SolidBrush graphBrush = new SolidBrush(Color.Black);
+            Rectangle panelArea = new Rectangle(0, 0, width, height/4);
+            Rectangle graphArea = new Rectangle(0, height / 4, width / 2, height * 3 / 4);
+            Rectangle labelArea = new Rectangle(width / 2, height / 4, width / 2, height * 3 / 4);
+
+            StringFormat stringFormat = new StringFormat();
+            stringFormat.Alignment = StringAlignment.Center;
+            stringFormat.LineAlignment = StringAlignment.Center;
+
+            TimeSpan total = TimeSpan.Zero;
+            foreach (String process in dict.Keys)
+            {
+                // Log.Text += dict[process] + " ";
+                total = total.Add(dict[process]);
+            }
+
+            // Log.Text += "TOTAL: " + total + "\r\n";
+
+            // If there is no data recorded or total data is less than FromMinutes
+            if (dict.Count == 0 || total.CompareTo(TimeSpan.FromMinutes(2)) < 0)
+            {
+                // Probably won't be needed much
+                graph.DrawString("No significant data", labelFont, graphBrush, panelArea, stringFormat);
+            }
+            else
+            {
+
+                graph.DrawString("Process Usage Data", labelFont, graphBrush, panelArea, stringFormat);
+
+
+                int y = height / 4;
+                int all = height * 3 / 4 - 15;
+                int iter = 0;
+                int legend = height / 4;
+
+                foreach(String data in dict.Keys) {
+                    double frac = dict[data].TotalMilliseconds / total.TotalMilliseconds;
+                    int end = (int)Math.Round(all * frac);
+
+                    String currcolor = colors[iter];
+                    // Log.Text += colors[iter];
+                    
+                    graphBrush = new SolidBrush(Color.FromArgb(int.Parse(colors[iter].Substring(0,2), System.Globalization.NumberStyles.HexNumber),
+                        int.Parse(colors[iter].Substring(2, 2), System.Globalization.NumberStyles.HexNumber),
+                        int.Parse(colors[iter].Substring(4, 2), System.Globalization.NumberStyles.HexNumber)));
+
+
+                    graph.FillRectangle(graphBrush, new Rectangle(width / 12, y, width / 6, end));
+                    graph.FillRectangle(graphBrush, width / 3, legend, 10, 10);
+
+                    labelFont = new Font("Tahoma", 10);
+                    graphBrush = new SolidBrush(Color.Black);
+
+                    String info = dict[data].ToString();
+                    String hhmmss = info.Substring(0, 2) + " h " + info.Substring(3, 2) + " m "
+                        + info.Substring(6, 2) + " s " + info.Substring(9, 3) + " ms";
+                    graph.DrawString(data + ": " + hhmmss, labelFont, graphBrush, width / 3 + 20, legend);
+
+                    legend += 15;
+                    y += end;
+                    iter++;
+                }
+            }
+
+            graphBrush.Dispose();
+            graph.Dispose();
         }
     }
 }
