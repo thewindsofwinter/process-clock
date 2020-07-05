@@ -126,10 +126,7 @@ namespace ProcessClock
                     file.WriteLine("Time spent on processes:");
                     foreach (String process in dict.Keys)
                     {
-                        if (!process.Equals("ProcessClock"))
-                        {
-                            file.WriteLine(process + ": " + dict[process]);
-                        }
+                        file.WriteLine(process + ": " + dict[process]);
                     }
                 }
                 Log.Text += "Successfully wrote data to file!\r\n";
