@@ -36,20 +36,20 @@
             // 
             this.Log.Dock = System.Windows.Forms.DockStyle.Left;
             this.Log.Location = new System.Drawing.Point(0, 0);
-            this.Log.MinimumSize = new System.Drawing.Size(200, 200);
+            this.Log.MinimumSize = new System.Drawing.Size(640, 200);
             this.Log.Multiline = true;
             this.Log.Name = "Log";
             this.Log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.Log.Size = new System.Drawing.Size(450, 536);
+            this.Log.Size = new System.Drawing.Size(640, 736);
             this.Log.TabIndex = 0;
             // 
             // DrawPanel
             // 
             this.DrawPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DrawPanel.Location = new System.Drawing.Point(450, 0);
+            this.DrawPanel.Location = new System.Drawing.Point(640, 0);
             this.DrawPanel.MinimumSize = new System.Drawing.Size(200, 200);
             this.DrawPanel.Name = "DrawPanel";
-            this.DrawPanel.Size = new System.Drawing.Size(726, 536);
+            this.DrawPanel.Size = new System.Drawing.Size(1136, 736);
             this.DrawPanel.TabIndex = 1;
             this.DrawPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DrawPanel_Paint);
             // 
@@ -57,10 +57,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1176, 536);
+            this.ClientSize = new System.Drawing.Size(1776, 736);
             this.Controls.Add(this.DrawPanel);
             this.Controls.Add(this.Log);
-            this.MinimumSize = new System.Drawing.Size(1200, 600);
+            this.MinimumSize = new System.Drawing.Size(1500, 800);
             this.Name = "Form1";
             this.Text = "Windows Process Clock";
             this.ResumeLayout(false);

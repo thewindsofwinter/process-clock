@@ -20,6 +20,7 @@ namespace ProcessClock
         WinEventDelegate dele = null;
         DateTime curr = DateTime.Now;
         Dictionary<String, TimeSpan> dict = null;
+        Dictionary<String, String> mapping = null;
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         String[] colors = { "E62817", "E67E17", "E6D417", "A1E617", "4BE617", "17E639", "17E68F",
@@ -35,11 +36,43 @@ namespace ProcessClock
             if (!exists)
                 System.IO.Directory.CreateDirectory(subPath);
 
+
+
             InitializeComponent();
             dict = new Dictionary<String, TimeSpan>();
+            mapping = new Dictionary<String, String>();
 
-            Log.Text += subPath + "\\" + curr.Month + "-" + curr.Day + ".txt" + "\r\n";
-            Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
+
+            if (!System.IO.File.Exists(subPath + "\\options.txt"))
+            {
+                System.IO.File.Create(subPath + "\\options.txt");
+            }
+            else
+            {
+                try
+                {
+                    using (StreamReader sr = new StreamReader(subPath + "\\options.txt"))
+                    {
+                        String s;
+                        while ((s = sr.ReadLine()) != null)
+                        {
+                            // Delimit based on mapping
+                            String[] arr = s.Replace(" maps to ", "~").Split('~');
+                            mapping.Add(arr[0], arr[1]);
+                            Log.Text += "Loaded data: Name " + arr[0] + " mapped to " + arr[1] + "\r\n";
+                        }
+                    }
+                }
+                catch (IOException e)
+                {
+                    Log.Text += "LOAD DATA FAILED\r\n";
+                    Console.WriteLine("The file could not be read:");
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            // Log.Text += subPath + "\\" + curr.Month + "-" + curr.Day + ".txt" + "\r\n";
+            // Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
             if(System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt"))
             {
                 try
@@ -56,6 +89,10 @@ namespace ProcessClock
                             String[] arr = s.Replace(": ", "~").Split('~');
                             TimeSpan val = TimeSpan.Parse(arr[1]);
                             dict.Add(arr[0], val);
+
+                            if (mapping.ContainsKey(arr[0]))
+                                arr[0] = mapping[arr[0]];
+
                             Log.Text += "Loaded data: Application " + arr[0] + " used for " + arr[1] + "\r\n";
                         }
                     }
@@ -114,7 +151,12 @@ namespace ProcessClock
             {
                 dict.Add(currprocess, diff);
             }
-            Log.Text += "Successfully added duration " + diff + " to process " + currprocess + "\r\n";
+
+            String displayname = currprocess;
+            if (mapping.ContainsKey(currprocess))
+                displayname = mapping[currprocess];
+
+            Log.Text += "Successfully added duration " + displayname + " to process " + currprocess + "\r\n";
 
             // If one opens the ProcessClock window, the program will automatically write all data to the day's file
             if (s.Equals("ProcessClock"))
@@ -192,16 +234,21 @@ namespace ProcessClock
                         int.Parse(colors[iter].Substring(4, 2), System.Globalization.NumberStyles.HexNumber)));
 
 
-                    graph.FillRectangle(graphBrush, new Rectangle(width / 12, y, width / 6, end));
-                    graph.FillRectangle(graphBrush, width / 3, legend, 10, 10);
+                    graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end));
+                    graph.FillRectangle(graphBrush, width / 4, legend, 10, 10);
 
                     labelFont = new Font("Tahoma", 10);
                     graphBrush = new SolidBrush(Color.Black);
 
                     String info = dict[data].ToString();
+                    String displayname = data;
                     String hhmmss = info.Substring(0, 2) + " h " + info.Substring(3, 2) + " m "
                         + info.Substring(6, 2) + " s " + info.Substring(9, 3) + " ms";
-                    graph.DrawString(data + ": " + hhmmss, labelFont, graphBrush, width / 3 + 20, legend);
+
+                    if (mapping.ContainsKey(data))
+                        displayname = mapping[data];
+
+                    graph.DrawString(displayname + ": " + hhmmss, labelFont, graphBrush, width / 4 + 20, legend);
 
                     legend += 15;
                     y += end;
