@@ -16,8 +16,17 @@ namespace ProcessClock
     public partial class Form1 : Form
     {
 
-
         WinEventDelegate dele = null;
+
+        /**
+         * Global variables:
+             * curr - current time
+             * dict - stores time spent on each application
+             * mapping - maps exe names to user-defined names (i.e. one could map "Taskmgr" to "Task Manager")
+             * currprocess - stores the process currently in focus
+             * path - path to user documents folder
+             * colors - colors to be used in graph
+         */
         DateTime curr = DateTime.Now;
         Dictionary<String, TimeSpan> dict = null;
         Dictionary<String, String> mapping = null;
@@ -29,6 +38,7 @@ namespace ProcessClock
 
         public Form1()
         {
+            // Create a folder to store ProcessClock files if it doesn't already exist
             string subPath = path + "\\ProcessClock";
 
             bool exists = System.IO.Directory.Exists(subPath);
@@ -37,12 +47,13 @@ namespace ProcessClock
                 System.IO.Directory.CreateDirectory(subPath);
 
 
-
+            // Initialize components and variables, make components redraw on resize
             InitializeComponent();
+            ResizeRedraw = true;
             dict = new Dictionary<String, TimeSpan>();
             mapping = new Dictionary<String, String>();
 
-
+            // Read user-defined mapping options: create option file if it does not exist
             if (!System.IO.File.Exists(subPath + "\\options.txt"))
             {
                 System.IO.File.Create(subPath + "\\options.txt");
@@ -73,6 +84,8 @@ namespace ProcessClock
 
             // Log.Text += subPath + "\\" + curr.Month + "-" + curr.Day + ".txt" + "\r\n";
             // Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
+            
+            // Check if there is already data for the current day: if so, intake data
             if(System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt"))
             {
                 try
@@ -105,6 +118,7 @@ namespace ProcessClock
                 }
             }
 
+            // Set current process
             currprocess = "ProcessClock";
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
@@ -142,6 +156,7 @@ namespace ProcessClock
             String s = GetActiveProcessName();
             DateTime now = DateTime.Now;
 
+            // Update the amount of time spent on processes
             System.TimeSpan diff = DateTime.Now.Subtract(curr);
             if (dict.ContainsKey(currprocess))
             {
@@ -172,6 +187,8 @@ namespace ProcessClock
                     }
                 }
                 Log.Text += "Successfully wrote data to file!\r\n";
+
+                // Redraw static data graph
                 this.Invalidate(true);
             }
 
@@ -184,18 +201,27 @@ namespace ProcessClock
             Graphics graph;
 
             graph = e.Graphics;
+
+            /**
+             * Variables to draw static graph:
+                * width - width of panel
+                * height - height of panel
+                * labelFont - font for drawing labels, may be modified
+                * graphBrush - color used in graph
+                * panelArea - area used for graph title
+             */
             int width = DrawPanel.Width;
             int height = DrawPanel.Height;
             Font labelFont = new Font("Garamond", 18);
             SolidBrush graphBrush = new SolidBrush(Color.Black);
             Rectangle panelArea = new Rectangle(0, 0, width, height/4);
-            Rectangle graphArea = new Rectangle(0, height / 4, width / 2, height * 3 / 4);
-            Rectangle labelArea = new Rectangle(width / 2, height / 4, width / 2, height * 3 / 4);
 
-            StringFormat stringFormat = new StringFormat();
-            stringFormat.Alignment = StringAlignment.Center;
-            stringFormat.LineAlignment = StringAlignment.Center;
+            // Format for title
+            StringFormat titleFormat = new StringFormat();
+            titleFormat.Alignment = StringAlignment.Center;
+            titleFormat.LineAlignment = StringAlignment.Center;
 
+            // Get the total amount of time spent on applications
             TimeSpan total = TimeSpan.Zero;
             foreach (String process in dict.Keys)
             {
@@ -205,38 +231,45 @@ namespace ProcessClock
 
             // Log.Text += "TOTAL: " + total + "\r\n";
 
-            // If there is no data recorded or total data is less than FromMinutes
+            // If there is no data recorded or total data is less than FromMinutes, note that
             if (dict.Count == 0 || total.CompareTo(TimeSpan.FromMinutes(2)) < 0)
             {
                 // Probably won't be needed much
-                graph.DrawString("No significant data", labelFont, graphBrush, panelArea, stringFormat);
+                graph.DrawString("No significant data", labelFont, graphBrush, panelArea, titleFormat);
             }
             else
             {
 
-                graph.DrawString("Process Usage Data", labelFont, graphBrush, panelArea, stringFormat);
+                graph.DrawString("Process Usage Data", labelFont, graphBrush, panelArea, titleFormat);
 
-
+                // Store current y-values for graph and 
                 int y = height / 4;
-                int all = height * 3 / 4 - 15;
-                int iter = 0;
                 int legend = height / 4;
 
+                // Range of y-values for graph and iterator
+                int all = height * 3 / 4 - 15;
+                int iter = 0;
+
                 foreach(String data in dict.Keys) {
+                    // Get percentages for time spent
                     double frac = dict[data].TotalMilliseconds / total.TotalMilliseconds;
+                    // Height of current part of bar
                     int end = (int)Math.Round(all * frac);
 
+                    // Get color for graph
                     String currcolor = colors[iter];
                     // Log.Text += colors[iter];
                     
+                    // Parse hex into C# color object
                     graphBrush = new SolidBrush(Color.FromArgb(int.Parse(colors[iter].Substring(0,2), System.Globalization.NumberStyles.HexNumber),
                         int.Parse(colors[iter].Substring(2, 2), System.Globalization.NumberStyles.HexNumber),
                         int.Parse(colors[iter].Substring(4, 2), System.Globalization.NumberStyles.HexNumber)));
 
-
+                    // Draw part of bar and legend
                     graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end));
                     graph.FillRectangle(graphBrush, width / 4, legend, 10, 10);
 
+                    // Write label for graph
                     labelFont = new Font("Tahoma", 10);
                     graphBrush = new SolidBrush(Color.Black);
 
@@ -245,11 +278,13 @@ namespace ProcessClock
                     String hhmmss = info.Substring(0, 2) + " h " + info.Substring(3, 2) + " m "
                         + info.Substring(6, 2) + " s " + info.Substring(9, 3) + " ms";
 
+                    // If the app name has been mapped, change it
                     if (mapping.ContainsKey(data))
                         displayname = mapping[data];
 
                     graph.DrawString(displayname + ": " + hhmmss, labelFont, graphBrush, width / 4 + 20, legend);
 
+                    // Increase y-values and iterator
                     legend += 15;
                     y += end;
                     iter++;
