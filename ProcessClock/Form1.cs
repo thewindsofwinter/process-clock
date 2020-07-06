@@ -171,7 +171,7 @@ namespace ProcessClock
             if (mapping.ContainsKey(currprocess))
                 displayname = mapping[currprocess];
 
-            Log.Text += "Successfully added duration " + displayname + " to process " + currprocess + "\r\n";
+            Log.Text += "Successfully added duration " + diff + " to process " + displayname + "\r\n";
 
             // If one opens the ProcessClock window, the program will automatically write all data to the day's file
             if (s.Equals("ProcessClock"))
