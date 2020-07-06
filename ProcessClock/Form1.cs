@@ -264,9 +264,9 @@ namespace ProcessClock
                     // Log.Text += colors[iter];
                     
                     // Parse hex into C# color object
-                    graphBrush = new SolidBrush(Color.FromArgb(int.Parse(colors[iter].Substring(0,2), System.Globalization.NumberStyles.HexNumber),
-                        int.Parse(colors[iter].Substring(2, 2), System.Globalization.NumberStyles.HexNumber),
-                        int.Parse(colors[iter].Substring(4, 2), System.Globalization.NumberStyles.HexNumber)));
+                    graphBrush = new SolidBrush(Color.FromArgb(int.Parse(colors[iter].Substring(1,2), System.Globalization.NumberStyles.HexNumber),
+                        int.Parse(colors[iter].Substring(3, 2), System.Globalization.NumberStyles.HexNumber),
+                        int.Parse(colors[iter].Substring(5, 2), System.Globalization.NumberStyles.HexNumber)));
 
                     // Draw part of bar and legend
                     graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end));
