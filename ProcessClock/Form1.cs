@@ -32,8 +32,11 @@ namespace ProcessClock
         Dictionary<String, String> mapping = null;
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        String[] colors = { "E62817", "E67E17", "E6D417", "A1E617", "4BE617", "17E639", "17E68F",
-            "17E6E6", "178FE6", "1739E6", "4B17E6" };
+        // Added 20 colors: whoever needs to use more than 20 needs to get help
+        // Thanks to https://sashamaps.net/docs/tools/20-colors/ for the source
+        String[] colors = { "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#46f0f0", 
+            "#f032e6", "#bcf60c", "#fabebe", "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000", "#aaffc3", 
+            "#808000", "#ffd8b1", "#000075", "#808080", "#ffffff", "#000000" };
 
 
         public Form1()
