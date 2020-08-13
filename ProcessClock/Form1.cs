@@ -32,40 +32,20 @@ namespace ProcessClock
         Dictionary<String, String> mapping = null;
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        // Added 20 colors: whoever needs to use more than 20 needs to get help
-        // Thanks to https://sashamaps.net/docs/tools/20-colors/ for the source
-        String[] colors = { "#e6194b", "#3cb44b", "#ffe119", "#4363d8", "#f58231", "#911eb4", "#46f0f0", 
-            "#f032e6", "#bcf60c", "#fabebe", "#008080", "#e6beff", "#9a6324", "#fffac8", "#800000", "#aaffc3", 
-            "#808000", "#ffd8b1", "#000075", "#808080", "#ffffff", "#000000" };
+        String[] colors = { "#CC1414", "#B3B312", "#12B312", "#0F9999", "#1414CC", "#B312B3" };
 
-
-        public Form1()
+        public void LoadData(String dir)
         {
-            // Create a folder to store ProcessClock files if it doesn't already exist
-            string subPath = path + "\\ProcessClock";
-
-            bool exists = System.IO.Directory.Exists(subPath);
-
-            if (!exists)
-                System.IO.Directory.CreateDirectory(subPath);
-
-
-            // Initialize components and variables, make components redraw on resize
-            InitializeComponent();
-            ResizeRedraw = true;
-            dict = new Dictionary<String, TimeSpan>();
-            mapping = new Dictionary<String, String>();
-
             // Read user-defined mapping options: create option file if it does not exist
-            if (!System.IO.File.Exists(subPath + "\\options.txt"))
+            if (!System.IO.File.Exists(dir + "\\options.txt"))
             {
-                System.IO.File.Create(subPath + "\\options.txt");
+                System.IO.File.Create(dir + "\\options.txt");
             }
             else
             {
                 try
                 {
-                    using (StreamReader sr = new StreamReader(subPath + "\\options.txt"))
+                    using (StreamReader sr = new StreamReader(dir + "\\options.txt"))
                     {
                         String s;
                         while ((s = sr.ReadLine()) != null)
@@ -87,24 +67,27 @@ namespace ProcessClock
 
             // Log.Text += subPath + "\\" + curr.Month + "-" + curr.Day + ".txt" + "\r\n";
             // Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
-            
+
             // Check if there is already data for the current day: if so, intake data
-            if(System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt"))
+            if (System.IO.File.Exists(dir + "\\" + curr.Month + "-" + curr.Day + ".txt"))
             {
                 try
                 {   // Open the text file using a stream reader.
-                    using (StreamReader sr = new StreamReader(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt"))
+                    using (StreamReader sr = new StreamReader(dir + "\\" + curr.Month + "-" + curr.Day + ".txt"))
                     {
                         // Read the heading first
                         sr.ReadLine();
 
                         String s;
-                        while((s = sr.ReadLine()) != null)
+                        while ((s = sr.ReadLine()) != null)
                         {
                             // Split based on special delimiter
                             String[] arr = s.Replace(": ", "~").Split('~');
                             TimeSpan val = TimeSpan.Parse(arr[1]);
-                            dict.Add(arr[0], val);
+                            if (arr[0] != "Total")
+                            {
+                                dict.Add(arr[0], val);
+                            }
 
                             if (mapping.ContainsKey(arr[0]))
                                 arr[0] = mapping[arr[0]];
@@ -120,6 +103,47 @@ namespace ProcessClock
                     Console.WriteLine(e.Message);
                 }
             }
+        }
+
+        public void WriteData()
+        {
+            DateTime now = DateTime.Now;
+            TimeSpan total = TimeSpan.Zero;
+
+            System.IO.File.WriteAllText(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt", String.Empty);
+            using (System.IO.StreamWriter file =
+        new System.IO.StreamWriter(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt"))
+            {
+                file.WriteLine("Time spent on processes:");
+                foreach (String process in dict.Keys)
+                {
+                    file.WriteLine(process + ": " + dict[process]);
+                    total = total.Add(dict[process]);
+                }
+                file.WriteLine("Total: " + total);
+            }
+
+            Log.Text += "Successfully wrote data to file!\r\n";
+        }
+
+        public Form1()
+        {
+            // Create a folder to store ProcessClock files if it doesn't already exist
+            string subPath = path + "\\ProcessClock";
+
+            bool exists = System.IO.Directory.Exists(subPath);
+
+            if (!exists)
+                System.IO.Directory.CreateDirectory(subPath);
+
+
+            // Initialize components and variables, make components redraw on resize
+            InitializeComponent();
+            ResizeRedraw = true;
+            dict = new Dictionary<String, TimeSpan>();
+            mapping = new Dictionary<String, String>();
+
+            LoadData(subPath);
 
             // Set current process
             currprocess = "ProcessClock";
@@ -157,10 +181,10 @@ namespace ProcessClock
         public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             String s = GetActiveProcessName();
-            DateTime now = DateTime.Now;
 
             // Update the amount of time spent on processes
             System.TimeSpan diff = DateTime.Now.Subtract(curr);
+
             if (dict.ContainsKey(currprocess))
             {
                 dict[currprocess] = dict[currprocess].Add(diff);
@@ -179,24 +203,14 @@ namespace ProcessClock
             // If one opens the ProcessClock window, the program will automatically write all data to the day's file
             if (s.Equals("ProcessClock"))
             {
-                System.IO.File.WriteAllText(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt", String.Empty);
-                using (System.IO.StreamWriter file =
-            new System.IO.StreamWriter(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt"))
-                {
-                    file.WriteLine("Time spent on processes:");
-                    foreach (String process in dict.Keys)
-                    {
-                        file.WriteLine(process + ": " + dict[process]);
-                    }
-                }
-                Log.Text += "Successfully wrote data to file!\r\n";
+                WriteData();
 
                 // Redraw static data graph
                 this.Invalidate(true);
             }
 
             currprocess = s;
-            curr = now;
+            curr = DateTime.Now;
         }
 
         private void DrawPanel_Paint(object sender, PaintEventArgs e)
@@ -234,6 +248,9 @@ namespace ProcessClock
 
             // Log.Text += "TOTAL: " + total + "\r\n";
 
+            List<KeyValuePair<String, TimeSpan>> entries = dict.ToList();
+            entries.Sort((pair1, pair2) => pair2.Value.CompareTo(pair1.Value));
+            
             // If there is no data recorded or total data is less than FromMinutes, note that
             if (dict.Count == 0 || total.CompareTo(TimeSpan.FromMinutes(2)) < 0)
             {
@@ -245,7 +262,7 @@ namespace ProcessClock
 
                 graph.DrawString("Process Usage Data", labelFont, graphBrush, panelArea, titleFormat);
 
-                // Store current y-values for graph and 
+                // Store current y-values for graph and legend
                 int y = height / 4;
                 int legend = height / 4;
 
@@ -253,37 +270,51 @@ namespace ProcessClock
                 int all = height * 3 / 4 - 15;
                 int iter = 0;
 
-                foreach(String data in dict.Keys) {
+                foreach(KeyValuePair<String, TimeSpan> p in entries) {
                     // Get percentages for time spent
-                    double frac = dict[data].TotalMilliseconds / total.TotalMilliseconds;
+                    double frac =  p.Value.TotalMilliseconds / total.TotalMilliseconds;
+
                     // Height of current part of bar
                     int end = (int)Math.Round(all * frac);
 
                     // Get color for graph
-                    String currcolor = colors[iter];
                     // Log.Text += colors[iter];
-                    
-                    // Parse hex into C# color object
-                    graphBrush = new SolidBrush(Color.FromArgb(int.Parse(colors[iter].Substring(1,2), System.Globalization.NumberStyles.HexNumber),
-                        int.Parse(colors[iter].Substring(3, 2), System.Globalization.NumberStyles.HexNumber),
-                        int.Parse(colors[iter].Substring(5, 2), System.Globalization.NumberStyles.HexNumber)));
 
-                    // Draw part of bar and legend
-                    graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end));
-                    graph.FillRectangle(graphBrush, width / 4, legend, 10, 10);
+                    // Parse hex into C# color object
+                    if (iter < 6)
+                    {
+                        graphBrush = new SolidBrush(Color.FromArgb(int.Parse(colors[iter].Substring(1, 2), System.Globalization.NumberStyles.HexNumber),
+                            int.Parse(colors[iter].Substring(3, 2), System.Globalization.NumberStyles.HexNumber),
+                            int.Parse(colors[iter].Substring(5, 2), System.Globalization.NumberStyles.HexNumber)));
+
+                        // Draw part of bar and legend (small gap between bar elements)
+                        graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end - 3));
+                        graph.FillRectangle(graphBrush, width / 4, legend, 10, 10);
+                    }
+                    else
+                    {
+                        graphBrush = new SolidBrush(Color.FromArgb(100, 100, 100));
+
+                        // Draw part of bar and legend (no gap between bar elements)
+                        graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end));
+                        graph.FillRectangle(graphBrush, width / 4, legend, 10, 10);
+                    }
+
 
                     // Write label for graph
                     labelFont = new Font("Tahoma", 10);
                     graphBrush = new SolidBrush(Color.Black);
 
-                    String info = dict[data].ToString();
-                    String displayname = data;
+                    String info = p.Value.ToString();
+                    String displayname = p.Key;
                     String hhmmss = info.Substring(0, 2) + " h " + info.Substring(3, 2) + " m "
                         + info.Substring(6, 2) + " s " + info.Substring(9, 3) + " ms";
 
                     // If the app name has been mapped, change it
-                    if (mapping.ContainsKey(data))
-                        displayname = mapping[data];
+                    if (mapping.ContainsKey(p.Key))
+                    {
+                        displayname = mapping[p.Key];
+                    }
 
                     graph.DrawString(displayname + ": " + hhmmss, labelFont, graphBrush, width / 4 + 20, legend);
 
@@ -292,10 +323,33 @@ namespace ProcessClock
                     y += end;
                     iter++;
                 }
+
+                String t = total.ToString();
+                String time = t.Substring(0, 2) + " h " + t.Substring(3, 2) + " m "
+                    + t.Substring(6, 2) + " s " + t.Substring(9, 3) + " ms";
+
+                graph.DrawString("Total: " + time, labelFont, graphBrush, width / 4 + 20, legend);
+
             }
 
             graphBrush.Dispose();
             graph.Dispose();
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // Update the amount of time spent on processes
+            System.TimeSpan diff = DateTime.Now.Subtract(curr);
+
+            if (dict.ContainsKey(currprocess))
+            {
+                dict[currprocess] = dict[currprocess].Add(diff);
+            }
+            else
+            {
+                dict.Add(currprocess, diff);
+            }
+            WriteData();
         }
     }
 }

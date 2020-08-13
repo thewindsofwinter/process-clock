@@ -36,33 +36,35 @@
             // 
             this.Log.Dock = System.Windows.Forms.DockStyle.Left;
             this.Log.Location = new System.Drawing.Point(0, 0);
-            this.Log.MinimumSize = new System.Drawing.Size(640, 200);
+            this.Log.MinimumSize = new System.Drawing.Size(698, 208);
             this.Log.Multiline = true;
             this.Log.Name = "Log";
             this.Log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.Log.Size = new System.Drawing.Size(640, 736);
+            this.Log.Size = new System.Drawing.Size(800, 767);
             this.Log.TabIndex = 0;
             // 
             // DrawPanel
             // 
             this.DrawPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DrawPanel.Location = new System.Drawing.Point(640, 0);
-            this.DrawPanel.MinimumSize = new System.Drawing.Size(200, 200);
+            this.DrawPanel.Location = new System.Drawing.Point(800, 0);
+            this.DrawPanel.MinimumSize = new System.Drawing.Size(218, 208);
             this.DrawPanel.Name = "DrawPanel";
-            this.DrawPanel.Size = new System.Drawing.Size(1136, 736);
+            this.DrawPanel.Size = new System.Drawing.Size(1137, 767);
             this.DrawPanel.TabIndex = 1;
             this.DrawPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DrawPanel_Paint);
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(11F, 24F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1776, 736);
+            this.ClientSize = new System.Drawing.Size(1937, 767);
             this.Controls.Add(this.DrawPanel);
             this.Controls.Add(this.Log);
-            this.MinimumSize = new System.Drawing.Size(1500, 800);
+            this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.MinimumSize = new System.Drawing.Size(1743, 831);
             this.Name = "Form1";
             this.Text = "Windows Process Clock";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
