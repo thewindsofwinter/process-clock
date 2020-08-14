@@ -129,7 +129,9 @@ namespace ProcessClock
         public Form1()
         {
             // Create a folder to store ProcessClock files if it doesn't already exist
-            string subPath = path + "\\ProcessClock";
+            string subPath = path + "\\ProcessClock"; 
+            this.Icon = new Icon(path + "\\source\\repos\\ProcessClock\\icon\\icon.ico");
+
 
             bool exists = System.IO.Directory.Exists(subPath);
 
