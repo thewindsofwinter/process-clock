@@ -215,6 +215,28 @@ namespace ProcessClock
             curr = DateTime.Now;
         }
 
+        private void InfoPanel_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics graph;
+
+            graph = e.Graphics;
+
+            /**
+             * Variables to draw static graph:
+                * width - width of panel
+                * height - height of panel
+                * labelFont - font for drawing labels, may be modified
+                * graphBrush - color used in graph
+                * panelArea - area used for graph title
+             */
+            int width = InfoPanel.Width;
+            int height = InfoPanel.Height;
+            Font labelFont = new Font("Courier New", 18);
+            SolidBrush warningBrush = new SolidBrush(Color.Red);
+            SolidBrush infoBrush = new SolidBrush(Color.Black);
+            Rectangle panelArea = new Rectangle(0, 0, width, height / 4);
+        }
+
         private void DrawPanel_Paint(object sender, PaintEventArgs e)
         {
             Graphics graph;
