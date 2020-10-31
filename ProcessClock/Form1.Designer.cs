@@ -29,9 +29,9 @@
         private void InitializeComponent()
         {
             this.DrawPanel = new System.Windows.Forms.Panel();
-            this.Log = new System.Windows.Forms.TextBox();
             this.InfoPanel = new System.Windows.Forms.Panel();
             this.LeftContainer = new System.Windows.Forms.Panel();
+            this.panel1 = new System.Windows.Forms.Panel();
             this.LeftContainer.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -45,36 +45,35 @@
             this.DrawPanel.TabIndex = 3;
             this.DrawPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DrawPanel_Paint);
             // 
-            // Log
-            // 
-            this.Log.Dock = System.Windows.Forms.DockStyle.Top;
-            this.Log.Location = new System.Drawing.Point(0, 0);
-            this.Log.MinimumSize = new System.Drawing.Size(400, 208);
-            this.Log.Multiline = true;
-            this.Log.Name = "Log";
-            this.Log.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.Log.Size = new System.Drawing.Size(610, 477);
-            this.Log.TabIndex = 3;
-            // 
             // InfoPanel
             // 
-            this.InfoPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.InfoPanel.Location = new System.Drawing.Point(0, 483);
+            this.InfoPanel.Dock = System.Windows.Forms.DockStyle.Top;
+            this.InfoPanel.Location = new System.Drawing.Point(0, 0);
+            this.InfoPanel.MinimumSize = new System.Drawing.Size(200, 500);
             this.InfoPanel.Name = "InfoPanel";
-            this.InfoPanel.Size = new System.Drawing.Size(610, 284);
+            this.InfoPanel.Size = new System.Drawing.Size(610, 500);
             this.InfoPanel.TabIndex = 4;
             this.InfoPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.InfoPanel_Paint);
             // 
             // LeftContainer
             // 
+            this.LeftContainer.Controls.Add(this.panel1);
             this.LeftContainer.Controls.Add(this.InfoPanel);
-            this.LeftContainer.Controls.Add(this.Log);
             this.LeftContainer.Dock = System.Windows.Forms.DockStyle.Left;
             this.LeftContainer.Location = new System.Drawing.Point(0, 0);
             this.LeftContainer.MinimumSize = new System.Drawing.Size(400, 208);
             this.LeftContainer.Name = "LeftContainer";
             this.LeftContainer.Size = new System.Drawing.Size(610, 767);
             this.LeftContainer.TabIndex = 2;
+            // 
+            // panel1
+            // 
+            this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.panel1.Location = new System.Drawing.Point(0, 500);
+            this.panel1.MinimumSize = new System.Drawing.Size(200, 267);
+            this.panel1.Name = "panel1";
+            this.panel1.Size = new System.Drawing.Size(610, 267);
+            this.panel1.TabIndex = 5;
             // 
             // Form1
             // 
@@ -89,16 +88,15 @@
             this.Text = "Windows Process Clock";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
             this.LeftContainer.ResumeLayout(false);
-            this.LeftContainer.PerformLayout();
             this.ResumeLayout(false);
 
         }
 
         #endregion
         private System.Windows.Forms.Panel DrawPanel;
-        private System.Windows.Forms.TextBox Log;
         private System.Windows.Forms.Panel InfoPanel;
         private System.Windows.Forms.Panel LeftContainer;
+        private System.Windows.Forms.Panel panel1;
     }
 }
 

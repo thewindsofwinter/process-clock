@@ -30,12 +30,36 @@ namespace ProcessClock
         DateTime curr = DateTime.Now;
         Dictionary<String, TimeSpan> dict = null;
         Dictionary<String, String> mapping = null;
+        
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         String[] colors = { "#CC1414", "#B3B312", "#12B312", "#0F9999", "#1414CC", "#B312B3" };
 
+        DateTime lastWater;
+        DateTime goalTime;
+        String goal = "";
+
         public void LoadData(String dir)
         {
+            lastWater = DateTime.Now;
+            if(System.IO.File.Exists(dir + "\\deadlines.txt")) { 
+                try
+                {
+                    using (StreamReader sr = new StreamReader(dir + "\\deadlines.txt"))
+                    {
+                        String[] s = sr.ReadLine().Split('~');
+                        goalTime = DateTime.Parse(s[0]);
+                        goal = s[1];
+                    }
+                }
+                catch (IOException e)
+                {
+                    // Log.Text += "LOAD DATA FAILED\r\n";
+                    Console.WriteLine("The file could not be read:");
+                    Console.WriteLine(e.Message);
+                }
+            }
+
             // Read user-defined mapping options: create option file if it does not exist
             if (!System.IO.File.Exists(dir + "\\options.txt"))
             {
@@ -53,13 +77,13 @@ namespace ProcessClock
                             // Delimit based on mapping
                             String[] arr = s.Replace(" maps to ", "~").Split('~');
                             mapping.Add(arr[0], arr[1]);
-                            Log.Text += "Loaded data: Name " + arr[0] + " mapped to " + arr[1] + "\r\n";
+                            // Log.Text += "Loaded data: Name " + arr[0] + " mapped to " + arr[1] + "\r\n";
                         }
                     }
                 }
                 catch (IOException e)
                 {
-                    Log.Text += "LOAD DATA FAILED\r\n";
+                    // Log.Text += "LOAD DATA FAILED\r\n";
                     Console.WriteLine("The file could not be read:");
                     Console.WriteLine(e.Message);
                 }
@@ -92,13 +116,13 @@ namespace ProcessClock
                             if (mapping.ContainsKey(arr[0]))
                                 arr[0] = mapping[arr[0]];
 
-                            Log.Text += "Loaded data: Application " + arr[0] + " used for " + arr[1] + "\r\n";
+                            // Log.Text += "Loaded data: Application " + arr[0] + " used for " + arr[1] + "\r\n";
                         }
                     }
                 }
                 catch (IOException e)
                 {
-                    Log.Text += "LOAD DATA FAILED\r\n";
+                    // Log.Text += "LOAD DATA FAILED\r\n";
                     Console.WriteLine("The file could not be read:");
                     Console.WriteLine(e.Message);
                 }
@@ -123,7 +147,7 @@ namespace ProcessClock
                 file.WriteLine("Total: " + total);
             }
 
-            Log.Text += "Successfully wrote data to file!\r\n";
+            // Log.Text += "Successfully wrote data to file!\r\n";
         }
 
         public Form1()
@@ -200,7 +224,7 @@ namespace ProcessClock
             if (mapping.ContainsKey(currprocess))
                 displayname = mapping[currprocess];
 
-            Log.Text += "Successfully added duration " + diff + " to process " + displayname + "\r\n";
+            // Log.Text += "Successfully added duration " + diff + " to process " + displayname + "\r\n";
 
             // If one opens the ProcessClock window, the program will automatically write all data to the day's file
             if (s.Equals("ProcessClock"))
@@ -231,10 +255,39 @@ namespace ProcessClock
              */
             int width = InfoPanel.Width;
             int height = InfoPanel.Height;
-            Font labelFont = new Font("Courier New", 18);
-            SolidBrush warningBrush = new SolidBrush(Color.Red);
+            Font labelFont = new Font("Consolas", 18);
+            Font subtitleFont = new Font("Consolas", 14);
+            SolidBrush titleBrush = new SolidBrush(Color.Red);
             SolidBrush infoBrush = new SolidBrush(Color.Black);
             Rectangle panelArea = new Rectangle(0, 0, width, height / 4);
+
+            // Format for title
+            StringFormat titleFormat = new StringFormat();
+            titleFormat.Alignment = StringAlignment.Center;
+            titleFormat.LineAlignment = StringAlignment.Center;
+
+            graph.DrawString("+++ YOUR REMINDERS +++", labelFont, titleBrush, panelArea, titleFormat);
+
+            int ypos = height / 4;
+
+            if (!goal.Equals("") && DateTime.Now.CompareTo(goalTime) < 0)
+            {
+                TimeSpan diff = goalTime.Subtract(DateTime.Now);
+                long hrs = (long)Math.Round(diff.TotalHours);
+                int min = diff.Minutes;
+
+                graph.DrawString("As of " + DateTime.Now.ToShortTimeString() 
+                    + ", you have " + hrs + " hours " + min + " minutes\r\n" + goal, subtitleFont, titleBrush, 20, ypos);
+                ypos += 40;
+            }
+            else
+            {
+                graph.DrawString("No goal defined", subtitleFont, titleBrush, 20, ypos);
+                ypos += 40;
+            }
+
+
+
         }
 
         private void DrawPanel_Paint(object sender, PaintEventArgs e)
