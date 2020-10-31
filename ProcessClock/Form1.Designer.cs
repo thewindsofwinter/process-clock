@@ -35,8 +35,8 @@
             this.queryButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
+            this.endDateTime = new System.Windows.Forms.DateTimePicker();
+            this.startDateTime = new System.Windows.Forms.DateTimePicker();
             this.LeftContainer.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
@@ -77,8 +77,8 @@
             this.panel1.Controls.Add(this.queryButton);
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.dateTimePicker2);
-            this.panel1.Controls.Add(this.dateTimePicker1);
+            this.panel1.Controls.Add(this.endDateTime);
+            this.panel1.Controls.Add(this.startDateTime);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.panel1.Location = new System.Drawing.Point(0, 617);
             this.panel1.MinimumSize = new System.Drawing.Size(610, 150);
@@ -114,19 +114,19 @@
             this.label1.TabIndex = 2;
             this.label1.Text = "Start Date";
             // 
-            // dateTimePicker2
+            // endDateTime
             // 
-            this.dateTimePicker2.Location = new System.Drawing.Point(12, 53);
-            this.dateTimePicker2.Name = "dateTimePicker2";
-            this.dateTimePicker2.Size = new System.Drawing.Size(417, 31);
-            this.dateTimePicker2.TabIndex = 1;
+            this.endDateTime.Location = new System.Drawing.Point(12, 53);
+            this.endDateTime.Name = "endDateTime";
+            this.endDateTime.Size = new System.Drawing.Size(417, 31);
+            this.endDateTime.TabIndex = 1;
             // 
-            // dateTimePicker1
+            // startDateTime
             // 
-            this.dateTimePicker1.Location = new System.Drawing.Point(12, 15);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.Size = new System.Drawing.Size(417, 31);
-            this.dateTimePicker1.TabIndex = 0;
+            this.startDateTime.Location = new System.Drawing.Point(12, 15);
+            this.startDateTime.Name = "startDateTime";
+            this.startDateTime.Size = new System.Drawing.Size(417, 31);
+            this.startDateTime.TabIndex = 0;
             // 
             // Form1
             // 
@@ -155,8 +155,8 @@
         private System.Windows.Forms.Button queryButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.DateTimePicker dateTimePicker2;
-        private System.Windows.Forms.DateTimePicker dateTimePicker1;
+        private System.Windows.Forms.DateTimePicker endDateTime;
+        private System.Windows.Forms.DateTimePicker startDateTime;
     }
 }
 

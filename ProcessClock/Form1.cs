@@ -33,6 +33,7 @@ namespace ProcessClock
 
         DateTime start;
         DateTime end;
+        DateTime empty;
         
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
@@ -150,6 +151,12 @@ namespace ProcessClock
             dict = new Dictionary<String, TimeSpan>();
             mapping = new Dictionary<String, String>();
 
+            // Set maximum date on options
+            DateTime now = DateTime.Now;
+            startDateTime.MaxDate = now;
+            endDateTime.MaxDate = now;
+            InfoPanel.Invalidate(true);
+
             LoadData(subPath);
 
             // Set current process
@@ -213,7 +220,7 @@ namespace ProcessClock
                 WriteData();
 
                 // Redraw static data graph
-                this.Invalidate(true);
+                DrawPanel.Invalidate(true);
             }
 
             currprocess = s;
@@ -222,13 +229,63 @@ namespace ProcessClock
 
         private void InfoPanel_Paint(object sender, PaintEventArgs e)
         {
-            // Check if there is any data to paint
-            if(start == null && end == null)
-            {
+            
+            Graphics graph;
+            graph = e.Graphics;
 
+            /**
+             * Variables to draw static graph:
+                * width - width of panel
+                * height - height of panel
+                * labelFont - font for drawing labels, may be modified
+                * graphBrush - color used in graph
+                * panelArea - area used for graph title
+             */
+            int width = InfoPanel.Width;
+            int height = InfoPanel.Height;
+            Font titleFont = new Font("Garamond", 24);
+            Font labelFont = new Font("Tahoma", 10);
+            SolidBrush graphBrush = new SolidBrush(Color.Black);
+            Rectangle panelArea = new Rectangle(0, 0, width, height / 6);
+
+
+            // Format for title
+            StringFormat titleFormat = new StringFormat();
+            titleFormat.Alignment = StringAlignment.Center;
+            titleFormat.LineAlignment = StringAlignment.Center;
+
+            // Get the total amount of time spent on applications
+            TimeSpan total = TimeSpan.Zero;
+
+
+            // Store current y-values for graph and legend
+            int y = height / 6;
+            int legend = height / 6;
+
+            // Range of y-values for graph and iterator
+            int all = height * 5 / 6 - 15;
+            int iter = 0;
+
+            // Check if there is any data to paint
+            if (start.Equals(empty) && end.Equals(empty))
+            {
+                // Probably won't be needed much
+                graph.DrawString("Historical Data", titleFont, graphBrush, panelArea, titleFormat);
+
+                graph.DrawString("No Data Requested", labelFont, graphBrush, 20, y);
             }
             else
             {
+
+                if (start.CompareTo(end) > 0)
+                {
+                    graph.DrawString("Historical Data", labelFont, graphBrush, panelArea, titleFormat);
+                }
+                
+
+                Dictionary<String, TimeSpan> histdict = new Dictionary<String, TimeSpan>();
+
+                
 
             }
         }
@@ -249,9 +306,11 @@ namespace ProcessClock
              */
             int width = DrawPanel.Width;
             int height = DrawPanel.Height;
-            Font labelFont = new Font("Garamond", 18);
+            Font labelFont = new Font("Garamond", 24);
             SolidBrush graphBrush = new SolidBrush(Color.Black);
-            Rectangle panelArea = new Rectangle(0, 0, width, height/4);
+            Rectangle panelArea = new Rectangle(0, 0, width, height/6);
+
+            graph.DrawLine(new Pen(graphBrush), 1, 0, 1, height);
 
             // Format for title
             StringFormat titleFormat = new StringFormat();
@@ -283,11 +342,11 @@ namespace ProcessClock
                 graph.DrawString("Process Usage Data", labelFont, graphBrush, panelArea, titleFormat);
 
                 // Store current y-values for graph and legend
-                int y = height / 4;
-                int legend = height / 4;
+                int y = height / 6;
+                int legend = height / 6;
 
                 // Range of y-values for graph and iterator
-                int all = height * 3 / 4 - 15;
+                int all = height * 5 / 6 - 15;
                 int iter = 0;
 
                 foreach(KeyValuePair<String, TimeSpan> p in entries) {
@@ -374,7 +433,10 @@ namespace ProcessClock
 
         private void queryButton_Click(object sender, EventArgs e)
         {
-
+            // Assign new start and end date time values and invalidate InfoPanel
+            start = startDateTime.Value;
+            end = endDateTime.Value;
+            InfoPanel.Invalidate(true);
         }
     }
 }
