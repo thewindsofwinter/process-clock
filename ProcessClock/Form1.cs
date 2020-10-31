@@ -30,35 +30,16 @@ namespace ProcessClock
         DateTime curr = DateTime.Now;
         Dictionary<String, TimeSpan> dict = null;
         Dictionary<String, String> mapping = null;
+
+        DateTime start;
+        DateTime end;
         
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         String[] colors = { "#CC1414", "#B3B312", "#12B312", "#0F9999", "#1414CC", "#B312B3" };
 
-        DateTime lastWater;
-        DateTime goalTime;
-        String goal = "";
-
         public void LoadData(String dir)
         {
-            lastWater = DateTime.Now;
-            if(System.IO.File.Exists(dir + "\\deadlines.txt")) { 
-                try
-                {
-                    using (StreamReader sr = new StreamReader(dir + "\\deadlines.txt"))
-                    {
-                        String[] s = sr.ReadLine().Split('~');
-                        goalTime = DateTime.Parse(s[0]);
-                        goal = s[1];
-                    }
-                }
-                catch (IOException e)
-                {
-                    // Log.Text += "LOAD DATA FAILED\r\n";
-                    Console.WriteLine("The file could not be read:");
-                    Console.WriteLine(e.Message);
-                }
-            }
 
             // Read user-defined mapping options: create option file if it does not exist
             if (!System.IO.File.Exists(dir + "\\options.txt"))
@@ -241,53 +222,15 @@ namespace ProcessClock
 
         private void InfoPanel_Paint(object sender, PaintEventArgs e)
         {
-            Graphics graph;
-
-            graph = e.Graphics;
-
-            /**
-             * Variables to draw static graph:
-                * width - width of panel
-                * height - height of panel
-                * labelFont - font for drawing labels, may be modified
-                * graphBrush - color used in graph
-                * panelArea - area used for graph title
-             */
-            int width = InfoPanel.Width;
-            int height = InfoPanel.Height;
-            Font labelFont = new Font("Consolas", 18);
-            Font subtitleFont = new Font("Consolas", 14);
-            SolidBrush titleBrush = new SolidBrush(Color.Red);
-            SolidBrush infoBrush = new SolidBrush(Color.Black);
-            Rectangle panelArea = new Rectangle(0, 0, width, height / 4);
-
-            // Format for title
-            StringFormat titleFormat = new StringFormat();
-            titleFormat.Alignment = StringAlignment.Center;
-            titleFormat.LineAlignment = StringAlignment.Center;
-
-            graph.DrawString("+++ YOUR REMINDERS +++", labelFont, titleBrush, panelArea, titleFormat);
-
-            int ypos = height / 4;
-
-            if (!goal.Equals("") && DateTime.Now.CompareTo(goalTime) < 0)
+            // Check if there is any data to paint
+            if(start == null && end == null)
             {
-                TimeSpan diff = goalTime.Subtract(DateTime.Now);
-                long hrs = (long)Math.Round(diff.TotalHours);
-                int min = diff.Minutes;
 
-                graph.DrawString("As of " + DateTime.Now.ToShortTimeString() 
-                    + ", you have " + hrs + " hours " + min + " minutes\r\n" + goal, subtitleFont, titleBrush, 20, ypos);
-                ypos += 40;
             }
             else
             {
-                graph.DrawString("No goal defined", subtitleFont, titleBrush, 20, ypos);
-                ypos += 40;
+
             }
-
-
-
         }
 
         private void DrawPanel_Paint(object sender, PaintEventArgs e)
@@ -427,6 +370,11 @@ namespace ProcessClock
                 dict.Add(currprocess, diff);
             }
             WriteData();
+        }
+
+        private void queryButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
