@@ -153,10 +153,11 @@ namespace ProcessClock
         }
 
         // Schedule actions during certain times -- for switching between files at midnight
-        public void ScheduleAction(Action action, DateTime ExecutionTime)
+        public async void ScheduleAction(Action action, DateTime ExecutionTime)
         {
-            Task WaitTask = Task.Delay(ExecutionTime.Subtract(DateTime.Now));
-            WaitTask.ContinueWith(_ => action);
+            Debug.WriteLine("Waiting: " + ExecutionTime.Subtract(DateTime.Now));
+            await Task.Delay(ExecutionTime.Subtract(DateTime.Now));
+            action();
         }
 
 
