@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -157,7 +155,7 @@ namespace ProcessClock
         // Schedule actions during certain times -- for switching between files at midnight
         public void ScheduleAction(Action action, DateTime ExecutionTime)
         {
-            Task WaitTask = Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds);
+            Task WaitTask = Task.Delay(ExecutionTime.Subtract(DateTime.Now));
             WaitTask.ContinueWith(_ => action);
         }
 
@@ -198,6 +196,7 @@ namespace ProcessClock
             Action switchFilesAtMidnight = () => recordWindowSwitch(true);
             DateTime nextMidnight = DateTime.Today.AddDays(1);
 
+            Debug.WriteLine("Time scheduled for: " + nextMidnight);
             ScheduleAction(switchFilesAtMidnight, nextMidnight);
         }
 
@@ -231,6 +230,7 @@ namespace ProcessClock
         public void recordWindowSwitch(Boolean makeNewFile)
         {
             String s = GetActiveProcessName();
+            Debug.WriteLine(DateTime.Now + " " + makeNewFile);
 
             // Update the amount of time spent on processes
             System.TimeSpan diff = DateTime.Now.Subtract(curr);
