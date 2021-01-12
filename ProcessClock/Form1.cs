@@ -132,6 +132,13 @@ namespace ProcessClock
             // Log.Text += "Successfully wrote data to file!\r\n";
         }
 
+        // Schedule actions during certain times -- for switching between files at midnight
+        public async void ScheduleAction(Action action, DateTime ExecutionTime)
+        {
+            await Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds);
+            action();
+        }
+
         public Form1()
         {
             // Create a folder to store ProcessClock files if it doesn't already exist
@@ -192,7 +199,7 @@ namespace ProcessClock
             return p.ProcessName;
         }
 
-        public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        public void recordWindowSwitch(Boolean makeNewFile)
         {
             String s = GetActiveProcessName();
 
@@ -214,17 +221,30 @@ namespace ProcessClock
 
             // Log.Text += "Successfully added duration " + diff + " to process " + displayname + "\r\n";
 
-            // If one opens the ProcessClock window, the program will automatically write all data to the day's file
-            if (s.Equals("ProcessClock"))
+            // If this is not a "midnight" change, only write data if ProcessClock works
+            if (!makeNewFile)
             {
-                WriteData();
+                // If one opens the ProcessClock window, the program will automatically write all data to the day's file
+                if (s.Equals("ProcessClock"))
+                {
+                    WriteData();
 
-                // Redraw static data graph
-                DrawPanel.Invalidate(true);
+                    // Redraw static data graph
+                    DrawPanel.Invalidate(true);
+                }
+            }
+            else
+            {
+
             }
 
             currprocess = s;
             curr = DateTime.Now;
+        }
+
+        public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            recordWindowSwitch(false);
         }
 
         private void InfoPanel_Paint(object sender, PaintEventArgs e)
