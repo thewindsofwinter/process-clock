@@ -159,7 +159,6 @@ namespace ProcessClock
         {
             Task WaitTask = Task.Delay((int)ExecutionTime.Subtract(DateTime.Now).TotalMilliseconds);
             WaitTask.ContinueWith(_ => action);
-            WaitTask.Start();
         }
 
 
@@ -196,10 +195,10 @@ namespace ProcessClock
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
 
             // Make sure that stuff after midnight doesn't spill over
-            // Action switchFilesAtMidnight = () => recordWindowSwitch(true);
-            // DateTime nextMidnight = DateTime.Today.AddDays(1);
+            Action switchFilesAtMidnight = () => recordWindowSwitch(true);
+            DateTime nextMidnight = DateTime.Today.AddDays(1);
 
-            // ScheduleAction(switchFilesAtMidnight, nextMidnight);
+            ScheduleAction(switchFilesAtMidnight, nextMidnight);
         }
 
         delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
@@ -229,7 +228,7 @@ namespace ProcessClock
             return p.ProcessName;
         }
 
-        /* public void recordWindowSwitch(Boolean makeNewFile)
+        public void recordWindowSwitch(Boolean makeNewFile)
         {
             String s = GetActiveProcessName();
 
@@ -279,19 +278,19 @@ namespace ProcessClock
                 LoadData(subPath);
 
                 // Schedule next action for next midnight
-                // Action switchFilesAtMidnight = () => recordWindowSwitch(true);
-                // DateTime nextMidnight = DateTime.Today.AddDays(1);
+                Action switchFilesAtMidnight = () => recordWindowSwitch(true);
+                DateTime nextMidnight = DateTime.Today.AddDays(1);
 
-                // ScheduleAction(switchFilesAtMidnight, nextMidnight);
+                ScheduleAction(switchFilesAtMidnight, nextMidnight);
             }
 
             currprocess = s;
             curr = DateTime.Now;
-        } */
+        }
 
         public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            // recordWindowSwitch(false);
+            recordWindowSwitch(false);
         }
 
         private void InfoPanel_Paint(object sender, PaintEventArgs e)
