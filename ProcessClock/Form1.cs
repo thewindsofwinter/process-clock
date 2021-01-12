@@ -170,6 +170,12 @@ namespace ProcessClock
             currprocess = "ProcessClock";
             dele = new WinEventDelegate(WinEventProc);
             IntPtr m_hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, dele, 0, 0, WINEVENT_OUTOFCONTEXT);
+
+            // Make sure that stuff after midnight doesn't spill over
+            Action switchFilesAtMidnight = () => recordWindowSwitch(true);
+            DateTime nextMidnight = DateTime.Today.AddDays(1);
+
+            ScheduleAction(switchFilesAtMidnight, nextMidnight);
         }
 
         delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
