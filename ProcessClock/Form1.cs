@@ -37,9 +37,8 @@ namespace ProcessClock
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         String[] colors = { "#CC1414", "#B3B312", "#12B312", "#0F9999", "#1414CC", "#B312B3" };
 
-        public void LoadData(String dir)
+        public void LoadOptions(String dir)
         {
-
             // Read user-defined mapping options: create option file if it does not exist
             if (!System.IO.File.Exists(dir + "\\options.txt"))
             {
@@ -68,6 +67,12 @@ namespace ProcessClock
                     Console.WriteLine(e.Message);
                 }
             }
+        }
+
+        public void LoadData(String dir)
+        {
+
+            LoadOptions(dir);
 
             // Log.Text += subPath + "\\" + curr.Month + "-" + curr.Day + ".txt" + "\r\n";
             // Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
@@ -276,9 +281,9 @@ namespace ProcessClock
                 mapping = new Dictionary<String, String>();
 
                 // Prepare subpath
-                LoadData(subPath);
+                LoadOptions(subPath);
 
-                // Schedule next action for next midnight
+                // Schedule next action for next midnight, 30 seconds after
                 Action switchFilesAtMidnight = () => recordWindowSwitch(true);
                 DateTime nextMidnight = DateTime.Today.AddDays(1);
 
