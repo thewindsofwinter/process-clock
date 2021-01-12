@@ -132,6 +132,28 @@ namespace ProcessClock
             // Log.Text += "Successfully wrote data to file!\r\n";
         }
 
+        public void WriteDataPast()
+        {
+            // For ensuring that writing of data at midnight works out
+            DateTime past = DateTime.Now.AddMinutes(-4);
+            TimeSpan total = TimeSpan.Zero;
+
+            System.IO.File.WriteAllText(path + "\\ProcessClock\\" + past.Month + "-" + past.Day + ".txt", String.Empty);
+            using (System.IO.StreamWriter file =
+        new System.IO.StreamWriter(path + "\\ProcessClock\\" + past.Month + "-" + past.Day + ".txt"))
+            {
+                file.WriteLine("Time spent on processes:");
+                foreach (String process in dict.Keys)
+                {
+                    file.WriteLine(process + ": " + dict[process]);
+                    total = total.Add(dict[process]);
+                }
+                file.WriteLine("Total: " + total);
+            }
+
+            // Log.Text += "Successfully wrote data to file!\r\n";
+        }
+
         // Schedule actions during certain times -- for switching between files at midnight
         public async void ScheduleAction(Action action, DateTime ExecutionTime)
         {
@@ -241,7 +263,24 @@ namespace ProcessClock
             }
             else
             {
+                // Create a folder to store ProcessClock files if it doesn't already exist
+                string subPath = path + "\\ProcessClock";
 
+                // Write all remaining data
+                WriteDataPast();
+
+                // Clear current memory
+                dict = new Dictionary<String, TimeSpan>();
+                mapping = new Dictionary<String, String>();
+
+                // Prepare subpath
+                LoadData(subPath);
+
+                // Schedule next action for next midnight
+                Action switchFilesAtMidnight = () => recordWindowSwitch(true);
+                DateTime nextMidnight = DateTime.Today.AddDays(1);
+
+                ScheduleAction(switchFilesAtMidnight, nextMidnight);
             }
 
             currprocess = s;
