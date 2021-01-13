@@ -77,12 +77,21 @@ namespace ProcessClock
             // Log.Text += subPath + "\\" + curr.Month + "-" + curr.Day + ".txt" + "\r\n";
             // Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
 
-            // Check if there is already data for the current day: if so, intake data
-            if (System.IO.File.Exists(dir + "\\" + curr.Month + "-" + curr.Day + ".txt"))
+            // Check if there is a directory for the current year, if not, make one
+            String parent = dir + "\\" + curr.Year;
+            String file = dir + "\\" + curr.Year + "\\" + curr.Month + "-" + curr.Day + ".txt";
+
+            bool exists = System.IO.Directory.Exists(parent);
+
+            if (!exists)
+                System.IO.Directory.CreateDirectory(parent);
+
+            // Check if there is already data recorded for today
+            if (System.IO.File.Exists(file))
             {
                 try
                 {   // Open the text file using a stream reader.
-                    using (StreamReader sr = new StreamReader(dir + "\\" + curr.Month + "-" + curr.Day + ".txt"))
+                    using (StreamReader sr = new StreamReader(file))
                     {
                         // Read the heading first
                         sr.ReadLine();
@@ -116,12 +125,25 @@ namespace ProcessClock
 
         public void WriteData()
         {
+            // Check if there is a directory for the current year, if not, make one
+            String parent = path + "\\ProcessClock\\" + curr.Year;
+
+            bool exists = System.IO.Directory.Exists(parent);
+
+            if (!exists)
+                System.IO.Directory.CreateDirectory(parent);
+
+
             DateTime now = DateTime.Now;
             TimeSpan total = TimeSpan.Zero;
+            String data = parent + "\\" + curr.Month + "-" + curr.Day + ".txt";
 
-            System.IO.File.WriteAllText(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt", String.Empty);
+            // Clear data
+            System.IO.File.WriteAllText(data, String.Empty);
+
+            // Write new data
             using (System.IO.StreamWriter file =
-        new System.IO.StreamWriter(path + "\\ProcessClock\\" + now.Month + "-" + now.Day + ".txt"))
+        new System.IO.StreamWriter(data))
             {
                 file.WriteLine("Time spent on processes:");
                 foreach (String process in dict.Keys)
