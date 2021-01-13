@@ -196,6 +196,65 @@ namespace ProcessClock
             action();
         }
 
+        // Find the minimum date data was recorded
+        public DateTime getMinimumDate()
+        {
+            DirectoryInfo subPath = new DirectoryInfo(path + "\\ProcessClock");
+            DirectoryInfo[] subDirectories = subPath.GetDirectories();
+
+            int minYear = 9999;
+
+            foreach(DirectoryInfo dir in subDirectories)
+            {
+                String name = dir.Name;
+                int currentYear = 9999;
+                int.TryParse(name, out currentYear);
+
+                if(currentYear < minYear)
+                {
+                    minYear = currentYear;
+                }
+            }
+
+            if(minYear == 9999)
+            {
+                return DateTime.Now;
+            }
+
+            DirectoryInfo yearPath = new DirectoryInfo(path + "\\ProcessClock\\" + minYear);
+            FileInfo[] files = subPath.GetFiles();
+            int minMonth = 13;
+            int minDay = 32;
+            
+            foreach(FileInfo file in files)
+            {
+                // File name minus extension
+                String name = file.Name.Replace(".txt", "");
+
+                // Find month and day
+                int currMonth = int.Parse(name.Split('-')[0]);
+                int currDay = int.Parse(name.Split('-')[1]);
+
+                if(currMonth < minMonth)
+                {
+                    minMonth = currMonth;
+                    minDay = currDay;
+                }
+                else if(currMonth == minMonth && currDay < minDay)
+                {
+                    minDay = currDay;
+                }
+            }
+
+            if(minMonth == 13 || minDay == 32)
+            {
+                return DateTime.Now;
+            }
+            else
+            {
+                return new DateTime(minYear, minMonth, minDay);
+            }
+        }
 
         public Form1()
         {
@@ -216,6 +275,13 @@ namespace ProcessClock
             DateTime now = DateTime.Now;
             startDateTime.MaxDate = now;
             endDateTime.MaxDate = now;
+
+            // Set minimum date on options
+            DateTime min = getMinimumDate();
+            startDateTime.MinDate = min;
+            endDateTime.MinDate = min;
+
+
             InfoPanel.Invalidate(true);
 
             LoadData(subPath);
@@ -310,7 +376,7 @@ namespace ProcessClock
                 // Prepare subpath
                 LoadOptions(subPath);
 
-                // Schedule next action for next midnight, 30 seconds after
+                // Schedule next action for next midnight
                 Action switchFilesAtMidnight = () => recordWindowSwitch(true);
                 DateTime nextMidnight = DateTime.Today.AddDays(1);
 
