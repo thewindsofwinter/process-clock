@@ -4,7 +4,7 @@
 Welcome to Windows Process Clock, an open-source application to track productive time usage on Windows computers. To get started:
  - Download the executable, or alternatively build on your own computer
  - Run the application at least once to create the ~/ProcessClock directory
- - Data will be stored in ~/ProcessClock/month-day.txt
+ - Data will be stored in ~/ProcessClock/year/month-day.txt
  - Options can be written in ~/ProcessClock/options.txt
 
 ## Features
@@ -19,6 +19,6 @@ Welcome to Windows Process Clock, an open-source application to track productive
 Left: Log recording data, Right: Graph with process times
 
 ## To-Do
- - Visualizer for stored data
+ - Visualizer for stored data (**Window implemented, currently non-functional. Stand by for updates!**)
  - Statistics on use
  - Config file to classify processes
