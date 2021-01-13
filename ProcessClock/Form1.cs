@@ -37,6 +37,15 @@ namespace ProcessClock
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         String[] colors = { "#CC1414", "#B3B312", "#12B312", "#0F9999", "#1414CC", "#B312B3" };
 
+        public void CheckDirectories(String dir)
+        {
+            // If directory doesn't exist, make it
+            bool exists = System.IO.Directory.Exists(dir);
+
+            if (!exists)
+                System.IO.Directory.CreateDirectory(dir);
+        }
+
         public void LoadOptions(String dir)
         {
             // Read user-defined mapping options: create option file if it does not exist
@@ -81,10 +90,7 @@ namespace ProcessClock
             String parent = dir + "\\" + curr.Year;
             String file = dir + "\\" + curr.Year + "\\" + curr.Month + "-" + curr.Day + ".txt";
 
-            bool exists = System.IO.Directory.Exists(parent);
-
-            if (!exists)
-                System.IO.Directory.CreateDirectory(parent);
+            CheckDirectories(parent);
 
             // Check if there is already data recorded for today
             if (System.IO.File.Exists(file))
@@ -125,18 +131,15 @@ namespace ProcessClock
 
         public void WriteData()
         {
+            DateTime writeTime = DateTime.Now;
+
             // Check if there is a directory for the current year, if not, make one
-            String parent = path + "\\ProcessClock\\" + curr.Year;
-
-            bool exists = System.IO.Directory.Exists(parent);
-
-            if (!exists)
-                System.IO.Directory.CreateDirectory(parent);
-
+            String parent = path + "\\ProcessClock\\" + writeTime.Year;
+            CheckDirectories(parent);
 
             DateTime now = DateTime.Now;
             TimeSpan total = TimeSpan.Zero;
-            String data = parent + "\\" + curr.Month + "-" + curr.Day + ".txt";
+            String data = parent + "\\" + writeTime.Month + "-" + writeTime.Day + ".txt";
 
             // Clear data
             System.IO.File.WriteAllText(data, String.Empty);
@@ -163,9 +166,15 @@ namespace ProcessClock
             DateTime past = DateTime.Now.AddMinutes(-4);
             TimeSpan total = TimeSpan.Zero;
 
-            System.IO.File.WriteAllText(path + "\\ProcessClock\\" + past.Month + "-" + past.Day + ".txt", String.Empty);
+            // Check if there is a directory for the current year, if not, make one
+            String parent = path + "\\ProcessClock\\" + past.Year;
+            CheckDirectories(parent);
+
+            String data = parent + "\\" + past.Month + "-" + past.Day + ".txt";
+
+            System.IO.File.WriteAllText(data, String.Empty);
             using (System.IO.StreamWriter file =
-        new System.IO.StreamWriter(path + "\\ProcessClock\\" + past.Month + "-" + past.Day + ".txt"))
+        new System.IO.StreamWriter(data))
             {
                 file.WriteLine("Time spent on processes:");
                 foreach (String process in dict.Keys)
@@ -194,11 +203,7 @@ namespace ProcessClock
             string subPath = path + "\\ProcessClock"; 
             this.Icon = new Icon(path + "\\source\\repos\\ProcessClock\\icon\\icon.ico");
 
-
-            bool exists = System.IO.Directory.Exists(subPath);
-
-            if (!exists)
-                System.IO.Directory.CreateDirectory(subPath);
+            CheckDirectories(subPath);
 
 
             // Initialize components and variables, make components redraw on resize
