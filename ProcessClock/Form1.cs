@@ -222,7 +222,7 @@ namespace ProcessClock
             }
 
             DirectoryInfo yearPath = new DirectoryInfo(path + "\\ProcessClock\\" + minYear);
-            FileInfo[] files = subPath.GetFiles();
+            FileInfo[] files = yearPath.GetFiles();
             int minMonth = 13;
             int minDay = 32;
             
@@ -230,6 +230,7 @@ namespace ProcessClock
             {
                 // File name minus extension
                 String name = file.Name.Replace(".txt", "");
+                // Debug.WriteLine(name);
 
                 // Find month and day
                 int currMonth = int.Parse(name.Split('-')[0]);
