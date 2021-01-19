@@ -445,7 +445,15 @@ namespace ProcessClock
                 {
                     graph.DrawString("Historical Data", labelFont, graphBrush, panelArea, titleFormat);
 
-                    // Draw a graph
+                    // Draw a line graph
+                    
+                }
+                else if(start.CompareTo(end) == 0)
+                {
+                    graph.DrawString("Historical Data", labelFont, graphBrush, panelArea, titleFormat);
+
+                    // Draw a bar graph
+
                 }
                 else
                 {
