@@ -441,14 +441,19 @@ namespace ProcessClock
             }
             else
             {
-
                 if (start.CompareTo(end) > 0)
                 {
                     graph.DrawString("Historical Data", labelFont, graphBrush, panelArea, titleFormat);
+
+                    // Draw a graph
                 }
+                else
+                {
+                    // Probably won't be needed much
+                    graph.DrawString("Historical Data", titleFont, graphBrush, panelArea, titleFormat);
 
-                
-
+                    graph.DrawString("No Data Requested", labelFont, graphBrush, 20, y);
+                }
             }
         }
 
