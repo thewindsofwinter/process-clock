@@ -410,7 +410,7 @@ namespace ProcessClock
             int width = InfoPanel.Width;
             int height = InfoPanel.Height;
             Font titleFont = new Font("Garamond", 24);
-            Font labelFont = new Font("Tahoma", 10);
+            Font labelFont = new Font("Tahoma", 12);
             SolidBrush graphBrush = new SolidBrush(Color.Black);
             Rectangle panelArea = new Rectangle(0, 0, width, height / 6);
 
@@ -445,17 +445,18 @@ namespace ProcessClock
                 end = end.Date;
 
                 // Console.WriteLine(start + " " + end + " " + start.CompareTo(end));
-                if (start.CompareTo(end) > 0)
+                if (start.CompareTo(end) < 0)
                 {
-                    graph.DrawString("Historical Data", labelFont, graphBrush, panelArea, titleFormat);
+                    graph.DrawString("Historical Data: " + start.ToShortDateString() 
+                        + " to " + end.ToShortDateString(), titleFont, graphBrush, panelArea, titleFormat);
 
                     // Draw a line graph
                     
                 }
                 else if(start.CompareTo(end) == 0)
                 {
-                    graph.DrawString("Historical Data: " + start.ToLongDateString(), 
-                        labelFont, graphBrush, panelArea, titleFormat);
+                    graph.DrawString("Historical Data: " + start.ToShortDateString(), 
+                        titleFont, graphBrush, panelArea, titleFormat);
 
                     // Draw a bar graph
                     
@@ -465,7 +466,8 @@ namespace ProcessClock
                     // Probably won't be needed much
                     graph.DrawString("Historical Data", titleFont, graphBrush, panelArea, titleFormat);
 
-                    graph.DrawString("No Data Requested", labelFont, graphBrush, 20, y);
+                    graph.DrawString("Please edit your request: end date must be " +
+                        "after the start date.", labelFont, graphBrush, 20, y);
                 }
             }
         }
