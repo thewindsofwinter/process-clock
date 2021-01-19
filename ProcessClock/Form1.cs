@@ -441,6 +441,10 @@ namespace ProcessClock
             }
             else
             {
+                start = start.Date;
+                end = end.Date;
+
+                // Console.WriteLine(start + " " + end + " " + start.CompareTo(end));
                 if (start.CompareTo(end) > 0)
                 {
                     graph.DrawString("Historical Data", labelFont, graphBrush, panelArea, titleFormat);
@@ -450,10 +454,11 @@ namespace ProcessClock
                 }
                 else if(start.CompareTo(end) == 0)
                 {
-                    graph.DrawString("Historical Data", labelFont, graphBrush, panelArea, titleFormat);
+                    graph.DrawString("Historical Data: " + start.ToLongDateString(), 
+                        labelFont, graphBrush, panelArea, titleFormat);
 
                     // Draw a bar graph
-
+                    
                 }
                 else
                 {
