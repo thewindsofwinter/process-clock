@@ -475,6 +475,11 @@ namespace ProcessClock
                     // Loads the data into the historical array
                     LoadData(subPath, historical[0], start);
 
+                    foreach(KeyValuePair<String, TimeSpan> p in historical[0])
+                    {
+                        Console.WriteLine(p.Key + " " + p.Value);
+                    }
+
                     foreach(String p in historical[0].Keys)
                     {
                         Console.WriteLine(p);
