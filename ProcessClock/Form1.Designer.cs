@@ -47,7 +47,7 @@
             this.DrawPanel.Location = new System.Drawing.Point(610, 0);
             this.DrawPanel.MinimumSize = new System.Drawing.Size(400, 208);
             this.DrawPanel.Name = "DrawPanel";
-            this.DrawPanel.Size = new System.Drawing.Size(1327, 767);
+            this.DrawPanel.Size = new System.Drawing.Size(1327, 775);
             this.DrawPanel.TabIndex = 3;
             this.DrawPanel.Paint += new System.Windows.Forms.PaintEventHandler(this.DrawPanel_Paint);
             // 
@@ -69,7 +69,7 @@
             this.LeftContainer.Location = new System.Drawing.Point(0, 0);
             this.LeftContainer.MinimumSize = new System.Drawing.Size(400, 208);
             this.LeftContainer.Name = "LeftContainer";
-            this.LeftContainer.Size = new System.Drawing.Size(610, 767);
+            this.LeftContainer.Size = new System.Drawing.Size(610, 775);
             this.LeftContainer.TabIndex = 2;
             // 
             // panel1
@@ -80,10 +80,10 @@
             this.panel1.Controls.Add(this.endDateTime);
             this.panel1.Controls.Add(this.startDateTime);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.panel1.Location = new System.Drawing.Point(0, 617);
+            this.panel1.Location = new System.Drawing.Point(0, 618);
             this.panel1.MinimumSize = new System.Drawing.Size(610, 150);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(610, 150);
+            this.panel1.Size = new System.Drawing.Size(610, 157);
             this.panel1.TabIndex = 5;
             // 
             // queryButton
@@ -101,7 +101,7 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(441, 53);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(101, 25);
+            this.label2.Size = new System.Drawing.Size(85, 22);
             this.label2.TabIndex = 3;
             this.label2.Text = "End Date";
             // 
@@ -110,7 +110,7 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(436, 15);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(108, 25);
+            this.label1.Size = new System.Drawing.Size(91, 22);
             this.label1.TabIndex = 2;
             this.label1.Text = "Start Date";
             // 
@@ -118,21 +118,21 @@
             // 
             this.endDateTime.Location = new System.Drawing.Point(12, 53);
             this.endDateTime.Name = "endDateTime";
-            this.endDateTime.Size = new System.Drawing.Size(417, 31);
+            this.endDateTime.Size = new System.Drawing.Size(417, 28);
             this.endDateTime.TabIndex = 1;
             // 
             // startDateTime
             // 
             this.startDateTime.Location = new System.Drawing.Point(12, 15);
             this.startDateTime.Name = "startDateTime";
-            this.startDateTime.Size = new System.Drawing.Size(417, 31);
+            this.startDateTime.Size = new System.Drawing.Size(417, 28);
             this.startDateTime.TabIndex = 0;
             // 
             // Form1
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 22F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1937, 767);
+            this.ClientSize = new System.Drawing.Size(1937, 775);
             this.Controls.Add(this.DrawPanel);
             this.Controls.Add(this.LeftContainer);
             this.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));

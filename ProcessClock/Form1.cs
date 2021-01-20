@@ -437,7 +437,7 @@ namespace ProcessClock
             int legend = fullHeight / 6;
 
             // Range of y-values for graph and iterator
-            int all = height - 15;
+            int all = height - y - 15;
             int iter = 0;
 
             // Check if there is any data to paint
