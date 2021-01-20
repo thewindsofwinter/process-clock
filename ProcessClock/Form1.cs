@@ -93,6 +93,7 @@ namespace ProcessClock
             // Check if there is a directory for the current year, if not, make one
             String parent = dir + "\\" + dataTime.Year;
             String file = dir + "\\" + dataTime.Year + "\\" + dataTime.Month + "-" + dataTime.Day + ".txt";
+            Console.WriteLine(file);
 
             CheckDirectories(parent);
 
@@ -469,14 +470,23 @@ namespace ProcessClock
                     // Draw a bar graph
                     historical = new Dictionary<String, TimeSpan>[1];
                     historical[0] = new Dictionary<String, TimeSpan>();
+                    TimeSpan totalTime = TimeSpan.Zero;
 
                     // Loads the data into the historical array
                     LoadData(subPath, historical[0], start);
 
+                    foreach(String p in historical[0].Keys)
+                    {
+                        Console.WriteLine(p);
+                        totalTime.Add(historical[0][p]);
+                    }
+
+                    Console.WriteLine(totalTime);
+
                     foreach (KeyValuePair<String, TimeSpan> p in historical[0])
                     {
                         // Get percentages for time spent
-                        double frac = p.Value.TotalMilliseconds / total.TotalMilliseconds;
+                        double frac = p.Value.TotalMilliseconds / totalTime.TotalMilliseconds;
 
                         // Height of current part of bar
                         int end = (int)Math.Round(all * frac);
@@ -528,7 +538,7 @@ namespace ProcessClock
                         iter++;
                     }
 
-                    String t = total.ToString();
+                    String t = totalTime.ToString();
                     String time = t.Substring(0, 2) + " h " + t.Substring(3, 2) + " m "
                         + t.Substring(6, 2) + " s " + t.Substring(9, 3) + " ms";
 
