@@ -93,7 +93,7 @@ namespace ProcessClock
             // Check if there is a directory for the current year, if not, make one
             String parent = dir + "\\" + dataTime.Year;
             String file = dir + "\\" + dataTime.Year + "\\" + dataTime.Month + "-" + dataTime.Day + ".txt";
-            Console.WriteLine(file);
+            // Console.WriteLine(file);
 
             CheckDirectories(parent);
 
@@ -433,11 +433,11 @@ namespace ProcessClock
 
 
             // Store current y-values for graph and legend
-            int y = height / 6;
-            int legend = height / 6;
+            int y = fullHeight / 6;
+            int legend = fullHeight / 6;
 
             // Range of y-values for graph and iterator
-            int all = height * 5 / 6 - 15;
+            int all = height - 15;
             int iter = 0;
 
             // Check if there is any data to paint
@@ -460,6 +460,7 @@ namespace ProcessClock
                         + " to " + end.ToShortDateString(), titleFont, graphBrush, panelArea, titleFormat);
 
                     // Draw a line graph
+
                     
                 }
                 else if(start.CompareTo(end) == 0)
@@ -475,20 +476,18 @@ namespace ProcessClock
                     // Loads the data into the historical array
                     LoadData(subPath, historical[0], start);
 
-                    foreach(KeyValuePair<String, TimeSpan> p in historical[0])
-                    {
-                        Console.WriteLine(p.Key + " " + p.Value);
-                    }
-
                     foreach(String p in historical[0].Keys)
                     {
-                        Console.WriteLine(p);
-                        totalTime.Add(historical[0][p]);
+                        // Console.WriteLine(historical[0][p]);
+                        totalTime = totalTime.Add(historical[0][p]);
                     }
 
-                    Console.WriteLine(totalTime);
+                    // Console.WriteLine(totalTime);
 
-                    foreach (KeyValuePair<String, TimeSpan> p in historical[0])
+                    List<KeyValuePair<String, TimeSpan>> entries = historical[0].ToList();
+                    entries.Sort((pair1, pair2) => pair2.Value.CompareTo(pair1.Value));
+
+                    foreach (KeyValuePair<String, TimeSpan> p in entries)
                     {
                         // Get percentages for time spent
                         double frac = p.Value.TotalMilliseconds / totalTime.TotalMilliseconds;
