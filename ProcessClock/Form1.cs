@@ -35,7 +35,7 @@ namespace ProcessClock
         
         String currprocess = null;
         String path = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        String[] colors = { "#CC1414", "#B3B312", "#12B312", "#0F9999", "#1414CC", "#B312B3" };
+        String[] colors = { "#CC1414", "#D4AF37", "#12B312", "#0F9999", "#1414CC", "#B312B3" };
 
         public void CheckDirectories(String dir)
         {
