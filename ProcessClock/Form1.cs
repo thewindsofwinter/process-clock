@@ -27,6 +27,7 @@ namespace ProcessClock
          */
         DateTime curr = DateTime.Now;
         Dictionary<String, TimeSpan> dict = null;
+        Dictionary<String, TimeSpan>[] historical = null;
         Dictionary<String, String> mapping = null;
 
         DateTime start;
@@ -64,7 +65,10 @@ namespace ProcessClock
                         {
                             // Delimit based on mapping
                             String[] arr = s.Replace(" maps to ", "~").Split('~');
-                            mapping.Add(arr[0], arr[1]);
+                            if(!mapping.ContainsKey(arr[0]))
+                            {
+                                mapping.Add(arr[0], arr[1]);
+                            }
                             // Log.Text += "Loaded data: Name " + arr[0] + " mapped to " + arr[1] + "\r\n";
                         }
                     }
@@ -78,7 +82,7 @@ namespace ProcessClock
             }
         }
 
-        public void LoadData(String dir)
+        public void LoadData(String dir, Dictionary<String, TimeSpan> map, DateTime dataTime)
         {
 
             LoadOptions(dir);
@@ -87,8 +91,8 @@ namespace ProcessClock
             // Log.Text += (System.IO.File.Exists(subPath + "\\" + curr.Month + "-" + curr.Day + ".txt")) + "\r\n";
 
             // Check if there is a directory for the current year, if not, make one
-            String parent = dir + "\\" + curr.Year;
-            String file = dir + "\\" + curr.Year + "\\" + curr.Month + "-" + curr.Day + ".txt";
+            String parent = dir + "\\" + dataTime.Year;
+            String file = dir + "\\" + dataTime.Year + "\\" + dataTime.Month + "-" + dataTime.Day + ".txt";
 
             CheckDirectories(parent);
 
@@ -110,7 +114,7 @@ namespace ProcessClock
                             TimeSpan val = TimeSpan.Parse(arr[1]);
                             if (arr[0] != "Total")
                             {
-                                dict.Add(arr[0], val);
+                                map.Add(arr[0], val);
                             }
 
                             if (mapping.ContainsKey(arr[0]))
@@ -285,7 +289,7 @@ namespace ProcessClock
 
             InfoPanel.Invalidate(true);
 
-            LoadData(subPath);
+            LoadData(subPath, dict, curr);
 
             // Set current process
             currprocess = "ProcessClock";
@@ -398,6 +402,7 @@ namespace ProcessClock
             
             Graphics graph;
             graph = e.Graphics;
+            string subPath = path + "\\ProcessClock";
 
             /**
              * Variables to draw static graph:
@@ -409,10 +414,12 @@ namespace ProcessClock
              */
             int width = InfoPanel.Width;
             int height = InfoPanel.Height;
+            int fullHeight = DrawPanel.Height;
+
             Font titleFont = new Font("Garamond", 24);
             Font labelFont = new Font("Tahoma", 12);
             SolidBrush graphBrush = new SolidBrush(Color.Black);
-            Rectangle panelArea = new Rectangle(0, 0, width, height / 6);
+            Rectangle panelArea = new Rectangle(0, 0, width, fullHeight / 6);
 
 
             // Format for title
@@ -430,6 +437,7 @@ namespace ProcessClock
 
             // Range of y-values for graph and iterator
             int all = height * 5 / 6 - 15;
+            int iter = 0;
 
             // Check if there is any data to paint
             if (start.Equals(empty) && end.Equals(empty))
@@ -459,7 +467,72 @@ namespace ProcessClock
                         titleFont, graphBrush, panelArea, titleFormat);
 
                     // Draw a bar graph
-                    
+                    historical = new Dictionary<String, TimeSpan>[1];
+                    historical[0] = new Dictionary<String, TimeSpan>();
+
+                    // Loads the data into the historical array
+                    LoadData(subPath, historical[0], start);
+
+                    foreach (KeyValuePair<String, TimeSpan> p in historical[0])
+                    {
+                        // Get percentages for time spent
+                        double frac = p.Value.TotalMilliseconds / total.TotalMilliseconds;
+
+                        // Height of current part of bar
+                        int end = (int)Math.Round(all * frac);
+
+                        // Get color for graph
+                        // Log.Text += colors[iter];
+
+                        // Parse hex into C# color object
+                        if (iter < 6)
+                        {
+                            graphBrush = new SolidBrush(Color.FromArgb(int.Parse(colors[iter].Substring(1, 2), System.Globalization.NumberStyles.HexNumber),
+                                int.Parse(colors[iter].Substring(3, 2), System.Globalization.NumberStyles.HexNumber),
+                                int.Parse(colors[iter].Substring(5, 2), System.Globalization.NumberStyles.HexNumber)));
+
+                            // Draw part of bar and legend (small gap between bar elements)
+                            graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end - 3));
+                            graph.FillRectangle(graphBrush, width / 4, legend, 10, 10);
+                        }
+                        else
+                        {
+                            graphBrush = new SolidBrush(Color.FromArgb(100, 100, 100));
+
+                            // Draw part of bar and legend (no gap between bar elements)
+                            graph.FillRectangle(graphBrush, new Rectangle(width / 16, y, width / 8, end));
+                            graph.FillRectangle(graphBrush, width / 4, legend, 10, 10);
+                        }
+
+
+                        // Write label for graph
+                        labelFont = new Font("Tahoma", 10);
+                        graphBrush = new SolidBrush(Color.Black);
+
+                        String info = p.Value.ToString();
+                        String displayname = p.Key;
+                        String hhmmss = info.Substring(0, 2) + " h " + info.Substring(3, 2) + " m "
+                            + info.Substring(6, 2) + " s " + info.Substring(9, 3) + " ms";
+
+                        // If the app name has been mapped, change it
+                        if (mapping.ContainsKey(p.Key))
+                        {
+                            displayname = mapping[p.Key];
+                        }
+
+                        graph.DrawString(displayname + ": " + hhmmss, labelFont, graphBrush, width / 4 + 20, legend);
+
+                        // Increase y-values and iterator
+                        legend += 15;
+                        y += end;
+                        iter++;
+                    }
+
+                    String t = total.ToString();
+                    String time = t.Substring(0, 2) + " h " + t.Substring(3, 2) + " m "
+                        + t.Substring(6, 2) + " s " + t.Substring(9, 3) + " ms";
+
+                    graph.DrawString("Total: " + time, labelFont, graphBrush, width / 4 + 20, legend);
                 }
                 else
                 {
